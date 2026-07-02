@@ -1,7 +1,7 @@
 "use client"
 
 import useSWR from "swr"
-import { supabase } from "./supabase"
+import { hasSupabaseConfig, supabase } from "./supabase"
 import type { Employee, Location, Shift } from "./types"
 
 const LOCATION_DISPLAY_NAMES = [
@@ -12,6 +12,7 @@ const LOCATION_DISPLAY_NAMES = [
 ]
 
 async function fetchLocations(): Promise<Location[]> {
+  if (!hasSupabaseConfig) return []
   const { data, error } = await supabase.from("locations").select("*").order("name")
   if (error) throw new Error(error.message)
   const locations = data ?? []
@@ -25,12 +26,14 @@ async function fetchLocations(): Promise<Location[]> {
 }
 
 async function fetchEmployees(): Promise<Employee[]> {
+  if (!hasSupabaseConfig) return []
   const { data, error } = await supabase.from("employees").select("*").order("name")
   if (error) throw new Error(error.message)
   return data ?? []
 }
 
 async function fetchShiftsInRange([, start, end]: [string, string, string]): Promise<Shift[]> {
+  if (!hasSupabaseConfig) return []
   const { data, error } = await supabase
     .from("shifts")
     .select("*")
